@@ -7,7 +7,6 @@ from collections import defaultdict
 class StreetLightController:
     def __init__(self,model_path, labels_path='labels.txt'):
         self.model = RTDETR(model_path)
-        self.model = self.model.to('cuda')
 
         self.lamp_status = {}
         self.lamp_zones = self._define_lamp_zones()
