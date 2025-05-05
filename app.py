@@ -14,7 +14,7 @@ st.set_page_config(
 # Initialize controller
 @st.cache_resource
 def load_controller():
-    return StreetLightController("best.pt")
+    return StreetLightController("rtdetrweights.pt")
 
 controller = load_controller()
 
