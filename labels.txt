@@ -1,7 +1,8 @@
-bike
+bicycle
 bus
 car
-motor
+cng
+motorcycle
+other-vehicle
 person
-rider
-truck
+rickshaw
