@@ -15,7 +15,7 @@ def load_labels(path='labels.txt'):
 
 @st.cache_resource
 def load_model():
-    model = YOLO(os.path.join(os.getcwd(), 'best.pt'))
+    model = YOLO(os.path.join(os.getcwd(), 'rtdetr_weights.pt'))
     model.eval()
     return model
 
