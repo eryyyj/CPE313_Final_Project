@@ -7,6 +7,7 @@ import tempfile
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # Define object categories
 VEHICLE_CLASSES = {"car", "truck", "bus", "motorcycle", "van"}
@@ -41,7 +42,9 @@ def detect_objects_and_generate_video(video_path, model, labels, conf_thres=0.5)
         if not ret:
             break
 
-        timestamp = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000.0  # Time in seconds
+        # Use real-world current time
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         results = model(frame)[0]
 
         vehicle_count = 0
@@ -65,7 +68,7 @@ def detect_objects_and_generate_video(video_path, model, labels, conf_thres=0.5)
                     pedestrian_count += 1
 
         time_series_data.append({
-            'time_sec': round(timestamp, 2),
+            'timestamp': current_time,
             'vehicles': vehicle_count,
             'pedestrians': pedestrian_count
         })
@@ -102,17 +105,20 @@ if uploaded_video is not None:
         # Plot time-series
         st.subheader("Detection Over Time")
         plt.figure(figsize=(10, 5))
-        plt.plot(df['time_sec'], df['vehicles'], label='Vehicles', marker='o')
-        plt.plot(df['time_sec'], df['pedestrians'], label='Pedestrians', marker='x')
-        plt.xlabel("Time (s)")
+        plt.plot(df['timestamp'], df['vehicles'], label='Vehicles', marker='o')
+        plt.plot(df['timestamp'], df['pedestrians'], label='Pedestrians', marker='x')
+        plt.xticks(rotation=45)
+        plt.xlabel("Timestamp")
         plt.ylabel("Count")
         plt.title("Object Count Over Time")
         plt.legend()
+        plt.tight_layout()
         plt.grid(True)
         st.pyplot(plt)
 
         # Show and download result video
         st.subheader("Detection Output Video")
         with open(output_video_path, 'rb') as vid_file:
-            st.video(vid_file.read())
-            st.download_button("Download Output Video", vid_file, file_name="detection_output.mp4")
+            video_bytes = vid_file.read()
+            st.video(video_bytes)
+            st.download_button("Download Output Video", video_bytes, file_name="detection_output.mp4")
