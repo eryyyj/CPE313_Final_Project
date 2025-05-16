@@ -103,11 +103,17 @@ if uploaded_file:
         ax.legend()
         st.pyplot(fig)
 
-        # Display video
-        st.subheader("📺 Output Video with Annotations")
+        # Provide video download
+        st.subheader("⬇️ Download Output Video")
         with open(output_video_path, 'rb') as f:
-            st.video(f.read())
+            video_bytes = f.read()
+            st.download_button(
+                label="Download Tracked Video",
+                data=video_bytes,
+                file_name="tracked_output.mp4",
+                mime="video/mp4"
+            )
 
-        # Download CSV
+        # Provide CSV download
         csv_data = df.to_csv(index=False).encode("utf-8")
         st.download_button("⬇️ Download Count CSV", csv_data, "object_counts.csv", "text/csv")
