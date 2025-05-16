@@ -7,3 +7,4 @@ numpy==1.26.0
 ultralytics==8.3.107
 pandas
 matplotlib
+lap>=0.4
