@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-from supervision import ByteTrack
+from ultralytics.trackers.byte_tracker import BYTETracker
 
 # Define object categories
 VEHICLE_CLASSES = {"car", "truck", "bus", "motorcycle", "van"}
@@ -36,7 +36,7 @@ def detect_and_track(video_path, model, labels, conf_thres=0.5):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out_vid = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
-    tracker = ByteTrack()
+    tracker = BYTETracker()
 
     time_series_data = []
 
