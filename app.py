@@ -9,7 +9,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
 
-
 # Define object categories
 VEHICLE_CLASSES = {"car", "truck", "bus", "motorcycle", "van"}
 PEDESTRIAN_CLASSES = {"person"}
@@ -25,8 +24,8 @@ def load_model():
     model.eval()
     return model
 
-# Detection, tracking, and video output
-def detect_and_track(video_path, model, labels, conf_thres=0.5):
+# Detection and video output
+def detect_objects_and_generate_video(video_path, model, labels, conf_thres=0.5):
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -36,8 +35,6 @@ def detect_and_track(video_path, model, labels, conf_thres=0.5):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out_vid = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
-    tracker = BYTETracker()
-
     time_series_data = []
 
     while cap.isOpened():
@@ -45,43 +42,30 @@ def detect_and_track(video_path, model, labels, conf_thres=0.5):
         if not ret:
             break
 
+        # Use real-world current time
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         results = model(frame)[0]
 
-        detections = []
+        vehicle_count = 0
+        pedestrian_count = 0
+
         for box in results.boxes:
             conf = float(box.conf[0])
             if conf >= conf_thres:
                 cls = int(box.cls[0])
                 label = labels[cls] if cls < len(labels) else str(cls)
+
                 x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().astype(int)
-                detections.append({
-                    'bbox': [x1, y1, x2 - x1, y2 - y1],
-                    'score': conf,
-                    'class_id': cls,
-                    'label': label
-                })
+                color = (0, 255, 0) if label in PEDESTRIAN_CLASSES else (255, 0, 0)
+                cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+                cv2.putText(frame, f"{label} {conf:.2f}", (x1, y1 - 5),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-        tracks = tracker.update(detections)
-
-        # Count detections per class
-        vehicle_count = 0
-        pedestrian_count = 0
-
-        for track in tracks:
-            x1, y1, w, h = track['bbox']
-            label = labels[track['class_id']] if track['class_id'] < len(labels) else str(track['class_id'])
-
-            color = (0, 255, 0) if label in PEDESTRIAN_CLASSES else (255, 0, 0)
-            cv2.rectangle(frame, (x1, y1), (x1 + w, y1 + h), color, 2)
-            cv2.putText(frame, f"{label}", (x1, y1 - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-
-            if label in VEHICLE_CLASSES:
-                vehicle_count += 1
-            elif label in PEDESTRIAN_CLASSES:
-                pedestrian_count += 1
+                if label in VEHICLE_CLASSES:
+                    vehicle_count += 1
+                elif label in PEDESTRIAN_CLASSES:
+                    pedestrian_count += 1
 
         time_series_data.append({
             'timestamp': current_time,
@@ -98,7 +82,7 @@ def detect_and_track(video_path, model, labels, conf_thres=0.5):
     return df, output_path
 
 # Streamlit UI
-st.title("YOLOv8 + ByteTrack: Vehicle and Pedestrian Tracking")
+st.title("YOLO Video Detection App: Vehicles and Pedestrians")
 
 uploaded_video = st.file_uploader("Upload a video", type=["mp4", "mov", "avi", "mkv"])
 
@@ -110,11 +94,11 @@ if uploaded_video is not None:
     model = load_model()
     labels = load_labels()
 
-    if st.button("Start Detection and Tracking"):
-        with st.spinner("Processing... please wait"):
-            df, output_video_path = detect_and_track(tfile.name, model, labels)
+    if st.button("Start Detection"):
+        with st.spinner("Detecting... please wait"):
+            df, output_video_path = detect_objects_and_generate_video(tfile.name, model, labels)
 
-        st.success("Processing complete!")
+        st.success("Detection complete!")
         st.write("Time-Series Data (Vehicles and Pedestrians):")
         st.dataframe(df)
 
