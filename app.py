@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
-from ultralytics.trackers.byte_tracker import BYTETracker
+
 
 # Define object categories
 VEHICLE_CLASSES = {"car", "truck", "bus", "motorcycle", "van"}
@@ -65,28 +65,28 @@ def detect_and_track(video_path, model, labels, conf_thres=0.5):
 
         tracks = tracker.update(detections)
 
-        vehicle_ids = set()
-        pedestrian_ids = set()
+        # Count detections per class
+        vehicle_count = 0
+        pedestrian_count = 0
 
         for track in tracks:
             x1, y1, w, h = track['bbox']
-            track_id = track['track_id']
             label = labels[track['class_id']] if track['class_id'] < len(labels) else str(track['class_id'])
 
             color = (0, 255, 0) if label in PEDESTRIAN_CLASSES else (255, 0, 0)
             cv2.rectangle(frame, (x1, y1), (x1 + w, y1 + h), color, 2)
-            cv2.putText(frame, f"{label} ID:{track_id}", (x1, y1 - 5),
+            cv2.putText(frame, f"{label}", (x1, y1 - 5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
             if label in VEHICLE_CLASSES:
-                vehicle_ids.add(track_id)
+                vehicle_count += 1
             elif label in PEDESTRIAN_CLASSES:
-                pedestrian_ids.add(track_id)
+                pedestrian_count += 1
 
         time_series_data.append({
             'timestamp': current_time,
-            'vehicles': len(vehicle_ids),
-            'pedestrians': len(pedestrian_ids)
+            'vehicles': vehicle_count,
+            'pedestrians': pedestrian_count
         })
 
         out_vid.write(frame)
