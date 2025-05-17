@@ -8,3 +8,6 @@ ultralytics==8.3.107
 pandas
 matplotlib
 lap>=0.4
+tensorflow
+scikit-learn
+statsmodels
