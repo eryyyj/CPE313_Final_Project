@@ -109,6 +109,8 @@ if uploaded_video:
         model_arima_fit = model_arima.fit()
         st.text(model_arima_fit.summary())
         forecast_arima = model_arima_fit.forecast(steps=30)
+        forecast_index = pd.date_range(start=vehicles.index[-1], periods=30, freq='S')
+        forecast_arima.index = forecast_index
 
         fig2, ax2 = plt.subplots()
         ax2.plot(vehicles[-100:], label="Actual")
