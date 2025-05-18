@@ -18,10 +18,10 @@ from tensorflow.keras.layers import GRU, Dense
 import keras_tuner as kt
 
 st.set_page_config(page_title="RT-DETR + Traffic Forecasting", layout="wide")
-st.title("🚗 Pedestrian & Vehicle Tracker + Traffic Forecasting")
+st.title("Pedestrian & Vehicle Tracker + Traffic Forecasting")
 
 st.header("Video Tracking with RT-DETR + ByteTrack")
-uploaded_video = st.file_uploader("📤 Upload a video", type=["mp4", "avi", "mov"], key="video")
+uploaded_video = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"], key="video")
 if uploaded_video:
     with st.spinner("Processing video..."):
         temp_input = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
@@ -66,8 +66,8 @@ if uploaded_video:
         out.release()
         df_track = pd.DataFrame(frame_data)
 
-        st.success("✅ Video Processing Complete!")
-        st.subheader("📈 Object Count Over Time")
+        st.success("Video Processing Complete!")
+        st.subheader("Object Count Over Time")
         fig, ax = plt.subplots()
         ax.plot(df_track["frame"], df_track["vehicles"], label="Vehicles", color='green')
         ax.plot(df_track["frame"], df_track["pedestrians"], label="Pedestrians", color='red')
@@ -76,7 +76,7 @@ if uploaded_video:
         ax.legend()
         st.pyplot(fig)
 
-        st.subheader("⬇️ Download Output Video")
+        st.subheader("Download Output Video")
         with open(output_video_path, 'rb') as f:
             st.download_button("Download Tracked Video", f.read(), file_name="tracked_output.mp4", mime="video/mp4")
 
