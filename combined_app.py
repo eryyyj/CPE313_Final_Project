@@ -83,7 +83,7 @@ if uploaded_video:
         csv_data = df_track.to_csv(index=False).encode("utf-8")
         st.download_button("Download Count CSV", csv_data, "object_counts.csv", "text/csv")
 
-        # --- Automated GRU and ARIMA Forecasting ---
+    
         st.header("Traffic Volume Forecasting with ARIMA & GRU (from Tracking Data)")
         df = df_track.copy()
         df['Timestamp'] = pd.to_datetime(df['timestamp'])
