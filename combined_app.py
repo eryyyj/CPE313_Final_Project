@@ -17,7 +17,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import GRU, Dense
 import keras_tuner as kt
 
-st.set_page_config(page_title="RT-DETR + Traffic Forecasting", layout="wide")
+st.set_page_config(page_title="Traffic Monitoring and Forecasting App", layout="wide")
 st.title("Pedestrian & Vehicle Tracker + Traffic Forecasting")
 
 st.header("Video Tracking with RT-DETR + ByteTrack")
