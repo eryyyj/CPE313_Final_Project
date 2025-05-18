@@ -18,9 +18,9 @@ from tensorflow.keras.layers import GRU, Dense
 import keras_tuner as kt
 
 st.set_page_config(page_title="Traffic Monitoring and Forecasting App", layout="wide")
-st.title("Pedestrian & Vehicle Tracker + Traffic Forecasting")
+st.title("Traffic Monitoring and Forecasting App")
 
-st.header("Video Tracking with RT-DETR + ByteTrack")
+st.header("Video Tracking with RT-DETR and ByteTrack")
 uploaded_video = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"], key="video")
 if uploaded_video:
     with st.spinner("Processing video..."):
