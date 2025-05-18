@@ -11,3 +11,4 @@ lap>=0.4
 tensorflow
 scikit-learn
 statsmodels
+keras-tuner
