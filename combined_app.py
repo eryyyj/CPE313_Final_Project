@@ -81,7 +81,7 @@ if uploaded_video:
             st.download_button("Download Tracked Video", f.read(), file_name="tracked_output.mp4", mime="video/mp4")
 
         csv_data = df_track.to_csv(index=False).encode("utf-8")
-        st.download_button("⬇️ Download Count CSV", csv_data, "object_counts.csv", "text/csv")
+        st.download_button("Download Count CSV", csv_data, "object_counts.csv", "text/csv")
 
         # --- Automated GRU and ARIMA Forecasting ---
         st.header("Traffic Volume Forecasting with ARIMA & GRU (from Tracking Data)")
