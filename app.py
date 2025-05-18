@@ -10,37 +10,37 @@ import torch
 import os
 
 st.set_page_config(page_title="RT-DETR Tracker", layout="wide")
-st.title("🚗 Pedestrian & Vehicle Tracker with RT-DETR + ByteTrack")
+st.title("Pedestrian & Vehicle Tracker with RT-DETR + ByteTrack")
 
-uploaded_file = st.file_uploader("📤 Upload a video", type=["mp4", "avi", "mov"])
+uploaded_file = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"])
 if uploaded_file:
     with st.spinner("Processing video..."):
 
-        # Save uploaded video to a temp file
+        # code for saving the vid in temp file
         temp_input = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
         temp_input.write(uploaded_file.read())
         input_video_path = temp_input.name
 
-        # Create temporary output video path
+        # code for creating temp output path
         temp_output = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4')
         output_video_path = temp_output.name
 
-        # Load model
+        # loading the model
         model = RTDETR("rtdetr_weights.pt")
         model = model.to("cuda" if torch.cuda.is_available() else "cpu")
 
-        # Get video properties
+        # setting the vid properties
         cap = cv2.VideoCapture(input_video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         cap.release()
 
-        # Video writer setup
+        # code for the video writer setup
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
 
-        # Tracking
+        # container for counted objects
         frame_data = []
         unique_vehicles = set()
         unique_pedestrians = set()
@@ -67,7 +67,7 @@ if uploaded_file:
                     elif class_name == "person":
                         unique_pedestrians.add(track_id)
 
-            # Save count
+            # saving the count
             frame_data.append({
                 "timestamp": timestamp,
                 "frame": frame_idx,
@@ -75,10 +75,10 @@ if uploaded_file:
                 "pedestrians": len(unique_pedestrians)
             })
 
-            # Annotated frame
+            
             frame = result.plot()
 
-            # Display live counts on frame
+            # code for displaying the live count
             cv2.putText(frame, f"Vehicles: {len(unique_vehicles)}", (20, 50),
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.putText(frame, f"Pedestrians: {len(unique_pedestrians)}", (20, 100),
@@ -88,13 +88,12 @@ if uploaded_file:
 
         out.release()
 
-        # Convert data to DataFrame
         df = pd.DataFrame(frame_data)
 
-        st.success("✅ Processing complete!")
+        st.success("Processing is complete!")
 
-        # Show plot
-        st.subheader("📈 Object Count Over Time")
+        # plot of counts
+        st.subheader("Object Count Over Time")
         fig, ax = plt.subplots()
         ax.plot(df["frame"], df["vehicles"], label="Vehicles", color='green')
         ax.plot(df["frame"], df["pedestrians"], label="Pedestrians", color='red')
@@ -103,8 +102,8 @@ if uploaded_file:
         ax.legend()
         st.pyplot(fig)
 
-        # Provide video download
-        st.subheader("⬇️ Download Output Video")
+        # code for getting the output video with annotations
+        st.subheader("Download Output Video")
         with open(output_video_path, 'rb') as f:
             video_bytes = f.read()
             st.download_button(
@@ -114,6 +113,6 @@ if uploaded_file:
                 mime="video/mp4"
             )
 
-        # Provide CSV download
+        # code for downloading the csv file
         csv_data = df.to_csv(index=False).encode("utf-8")
-        st.download_button("⬇️ Download Count CSV", csv_data, "object_counts.csv", "text/csv")
+        st.download_button("Download Count CSV", csv_data, "object_counts.csv", "text/csv")
